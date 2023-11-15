@@ -46,16 +46,29 @@ def get_signature_metadata_from_commit(commits, git_folder):
 # Checks that every commit in the branch has been signed by a trusted contributor
 def validate_branch(commits_signature_metadata, contributors):
     for commit in commits_signature_metadata:
+        # If commit is False it means that the commit hasn't been signed
+        if not commit:
+            logging.error('The commit has not been signed')
+            return False
+
+        commit_valid_signature = False
         for contributor in contributors:
             if validate_gpg_metadata(contributor, commit):
+                commit_valid_signature = True
                 logging.debug('The commit is successfully signed by')
 
                 # Move the contributor on top of the list to speed up the future validations
                 # In fact, if somebody contributed once it has a higher probability to have more than one commits
                 contributors.remove(contributor)
                 contributors.insert(0, contributor)
-                return True
-    return False
+
+                # Continue to the next commit
+                break
+        if not commit_valid_signature:
+            logging.error('The commit is not signed by a trusted contributor')
+            logging.error(commit)
+            return False
+    return True
 
 
 # Given a contributor and a commit_gpg_metadata checks if all the fields match. If the match returns the contributor
@@ -108,6 +121,7 @@ if __name__ == '__main__':
     # We load the trusted contributors on the repository
     contributors = load_contributors_conf('./contributors')
 
+    # TODO set a default folder to this
     git_folder = '/home/alessandro/Documents/BlockchainforGOOD'
 
     # Extracts all the commmits related to the PR
