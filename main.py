@@ -126,8 +126,8 @@ if __name__ == '__main__':
     # Read the PR_source_branch and PR_destination_branch from the arguments passed during the script execution
     # TODO support a multi-branch build
     argument_parser = argparse.ArgumentParser()
-    argument_parser.add_argument("--source_branch", dest='source_branch',  help='Source branch of the Pull Request')
-    argument_parser.add_argument("--destination_branch", dest='destination_branch', help='Destination branch of the Pull Request')
+    argument_parser.add_argument("--source_branch", required=False, dest='source_branch',  help='Source branch of the Pull Request')
+    argument_parser.add_argument("--destination_branch", required=False, dest='destination_branch', help='Destination branch of the Pull Request')
     args = argument_parser.parse_args()
 
     # Use the environment variables if they are set, otherwise use the arguments
