@@ -128,6 +128,7 @@ if __name__ == '__main__':
     argument_parser = argparse.ArgumentParser()
     argument_parser.add_argument("--source_branch", required=False, dest='source_branch',  help='Source branch of the Pull Request')
     argument_parser.add_argument("--destination_branch", required=False, dest='destination_branch', help='Destination branch of the Pull Request')
+    argument_parser.add_argument("--git_folder", required=False, dest='git_folder', help='Path to the git folder')
     args = argument_parser.parse_args()
 
     # Use the environment variables if they are set, otherwise use the arguments
@@ -136,8 +137,11 @@ if __name__ == '__main__':
     # We load the trusted contributors on the repository
     contributors = load_contributors_conf('./contributors')
 
-    # TODO set a default folder to this
-    git_folder = '/home/alessandro/Documents/BlockchainforGOOD'
+    # Set a default value for the git folder if it's not set passed as argument
+    if args.git_folder is not None:
+        git_folder = args.git_folder
+    else:
+        git_folder = '/home/commitVerify'
 
     # Extracts all the commmits related to the PR
     commits = get_pr_commit_list(source_branch, destination_branch, git_folder)
