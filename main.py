@@ -113,9 +113,9 @@ def load_contributors_conf(contributors_folder):  # TODO this is stateful, we do
 # Returns the source_branch and destination_branch from the environment variables if they are not set as arguments
 def get_env_var_for_branches(source_branch, destination_branch):
     if "source_branch" in os.environ and source_branch is None:
-        source_branch = os.environ["source_branch"]
+        source_branch = os.environ["SOURCE_BRANCH"]
     if "destination_branch" in os.environ and destination_branch is None:
-        destination_branch = os.environ["destination_branch"]
+        destination_branch = os.environ["DESTINATION_BRANCH"]
     return source_branch, destination_branch
 
 
