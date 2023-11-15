@@ -26,7 +26,7 @@ def get_signature_metadata_from_commit(commits, git_folder):
         # If the git commit hasn't been signed the return code will be 1
         if verify_command.returncode != 0:
             # TODO use fstrings
-            logging.error(f"The following commit couldn't be verified - " + str(commit_sha1))
+            logging.warning(f"The following commit couldn't be verified - " + str(commit_sha1))
             logging.debug(f"Return code:" + str(verify_command.returncode))
             logging.debug(verify_command.stderr)
             return False
@@ -120,6 +120,9 @@ def get_env_var_for_branches(source_branch, destination_branch):
 
 
 if __name__ == '__main__':
+    # Set the logger level
+    logging.basicConfig(level=logging.DEBUG)
+
     # Read the PR_source_branch and PR_destination_branch from the arguments passed during the script execution
     # TODO support a multi-branch build
     argument_parser = argparse.ArgumentParser()
@@ -147,9 +150,7 @@ if __name__ == '__main__':
 
     if is_branch_valid:
         logging.info('The given branch has been successfully validated')
-        print("The branch is valid")
         exit(0)
     else:
         logging.warning('The given branch contains at least a commit that is not valid')
-        print("[!] - The branch is not valid")
         exit(1)
