@@ -110,13 +110,25 @@ def load_contributors_conf(contributors_folder):  # TODO this is stateful, we do
     return contributors
 
 
+# Returns the source_branch and destination_branch from the environment variables if they are not set as arguments
+def get_env_var_for_branches(source_branch, destination_branch):
+    if "source_branch" in os.environ and source_branch is None:
+        source_branch = os.environ["source_branch"]
+    if "destination_branch" in os.environ and destination_branch is None:
+        destination_branch = os.environ["destination_branch"]
+    return source_branch, destination_branch
+
+
 if __name__ == '__main__':
     # Read the PR_source_branch and PR_destination_branch from the arguments passed during the script execution
     # TODO support a multi-branch build
     argument_parser = argparse.ArgumentParser()
-    argument_parser.add_argument(dest='source_branch', help='Source branch of the Pull Request')
-    argument_parser.add_argument(dest='destination_branch', help='Destination branch of the Pull Request')
-    argument_parser.parse_args()
+    argument_parser.add_argument("--source_branch", dest='source_branch',  help='Source branch of the Pull Request')
+    argument_parser.add_argument("--destination_branch", dest='destination_branch', help='Destination branch of the Pull Request')
+    args = argument_parser.parse_args()
+
+    # Use the environment variables if they are set, otherwise use the arguments
+    source_branch, destination_branch = get_env_var_for_branches(args.source_branch, args.destination_branch)
 
     # We load the trusted contributors on the repository
     contributors = load_contributors_conf('./contributors')
@@ -125,8 +137,7 @@ if __name__ == '__main__':
     git_folder = '/home/alessandro/Documents/BlockchainforGOOD'
 
     # Extracts all the commmits related to the PR
-    # TODO pass the arguments as parameters
-    commits = get_pr_commit_list('add_readme', 'main', git_folder)
+    commits = get_pr_commit_list(source_branch, destination_branch, git_folder)
 
     # For each commit check that it's signed and extract the signature metadata
     commit_signatures = [get_signature_metadata_from_commit(commits, git_folder) for commit in commits]
