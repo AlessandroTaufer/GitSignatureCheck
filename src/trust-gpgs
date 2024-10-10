@@ -1,0 +1,17 @@
+#!/bin/bash
+
+KEY_DIR="$1"
+
+if [ -z "$KEY_DIR" ]; then
+    echo "[!] KEY_DIR is mandatory"
+    exit 1
+fi
+
+if [ -z "$(ls $KEY_DIR)" ]; then
+  echo "No key files found in $KEY_DIR"
+  exit 0
+fi
+
+for KEY_FILE in $KEY_DIR/*; do
+    gpg --batch --trust-model always --import "$KEY_FILE"
+done

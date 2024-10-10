@@ -1,0 +1,35 @@
+#!/bin/bash
+
+# Folder that will contain the gpg keys to trust before the execution of the check
+live_gpg_trust_dir=/mnt/resources/live_trusted_signatures
+
+# If BASE_BRANCH env var is defined, use it. Fallback to main otherwise
+if [ -v "$BASE_BRANCH" ]; then
+  base_branch="$BASE_BRANCH"
+else
+  base_branch="origin/main"
+fi
+
+# If LIVE_GPG_TRUST is defined, then run the live import of the gpg keys
+if [ -v "$LIVE_GPG_TRUST" ]; then
+  trust-gpgs $live_gpg_trust_dir
+fi
+
+# Get the commit hash where the current branch diverged from master
+diverge_point=$(git merge-base HEAD $base_branch)
+
+# Get all commit hashes from HEAD to the divergence point
+commits=$(git rev-list --ancestry-path $diverge_point..HEAD)
+
+# Loop over the commit hashes and verify each one
+for commit in $commits; do
+    echo "Verifying commit $commit"
+    git verify-commit -v $commit
+    if [ $? -ne 0 ]; then
+        echo "Commit $commit failed verification"
+        exit 1
+    fi
+done
+
+echo "All commits verified successfully"
+exit 0
