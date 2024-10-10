@@ -2,16 +2,19 @@
 
 KEY_DIR="$1"
 
+# Fail if KEY_DIR it's not defined
 if [ -z "$KEY_DIR" ]; then
     echo "[!] KEY_DIR is mandatory"
     exit 1
 fi
 
+# Skip if the folder that should contain the keys it's empty
 if [ -z "$(ls $KEY_DIR)" ]; then
   echo "No key files found in $KEY_DIR"
   exit 0
 fi
 
+# Import all the keys in the folder
 for KEY_FILE in $KEY_DIR/*; do
     gpg --batch --trust-model always --import "$KEY_FILE"
 done
